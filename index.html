@@ -3,33 +3,43 @@
 <head>
   <base target="_top">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
-    body { background-color: #1a0000; color: #ffffff; font-family: 'Noto Sans KR', sans-serif; }
+    body { background-color: #f9f9f9; color: #333333; font-family: 'Noto Sans KR', sans-serif; }
     .hero-section {
-      background: linear-gradient(rgba(26, 0, 0, 0.6), rgba(26, 0, 0, 0.9)), url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1000') center/cover;
-      padding: 40px 20px; text-align: center; border-bottom: 4px solid #ff3333;
+      background: linear-gradient(rgba(230, 0, 0, 0.85), rgba(180, 0, 0, 0.95)), url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1000') center/cover;
+      padding: 50px 20px; text-align: center; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
-    h1, h2, h3 { color: #ff3333; text-shadow: 2px 2px 4px #000000; font-weight: bold; }
-    .card { background-color: #2b0505; border: 1px solid #ff3333; color: white; margin-bottom: 20px; }
-    .nav-tabs .nav-link { color: #ccc; }
-    .nav-tabs .nav-link.active { background-color: #ff3333; color: white; border-color: #ff3333; }
-    .btn-danger { background-color: #cc0000; border: none; }
-    .btn-danger:hover { background-color: #ff3333; }
-    .badge-score { background-color: #ff3333; font-size: 1rem; }
-    .loading-text { color: #ff3333; font-style: italic; }
-    .table-schedule { color: white; background-color: #2b0505; }
-    .table-schedule th { color: #ff3333; border-bottom: 2px solid #ff3333; }
-    .table-schedule td { border-bottom: 1px solid #441111; }
+    h1 { font-weight: 900; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); font-size: 2.5rem; }
+    h2, h3, h4 { color: #e60000; font-weight: 700; }
+    .card { background-color: #ffffff; border: none; border-top: 4px solid #e60000; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; }
+    .nav-tabs { border-bottom: 2px solid #e60000; }
+    .nav-tabs .nav-link { color: #555; font-weight: bold; border: none; padding: 12px 20px; }
+    .nav-tabs .nav-link.active { background-color: #e60000; color: white; border-radius: 6px 6px 0 0; }
+    .btn-danger { background-color: #e60000; border: none; font-weight: bold; }
+    .btn-danger:hover { background-color: #ff2222; }
+    .btn-outline-danger { color: #e60000; border-color: #e60000; font-weight: bold; }
+    .btn-outline-danger:hover { background-color: #e60000; color: white; }
+    .badge-score { background-color: #e60000; font-size: 1.1rem; padding: 6px 12px; }
+    .table-schedule { background-color: white; }
+    .table-schedule th { background-color: #f8d7da; color: #721c24; font-weight: bold; }
+    .card-score-box { border-left: 5px solid #e60000; background-color: #fff5f5; }
+    .deadline-banner { background-color: #fff3cd; color: #856404; font-weight: bold; border-left: 5px solid #ffc107; }
   </style>
 </head>
 <body>
 
   <div class="hero-section">
-    <h1>🔥 대~한민국! 붉은 악마 스코어 예측 🔥</h1>
-    <p class="lead text-warning">⚽ 제1경기: 대한민국 🇰🇷 vs 체코 🇨🇿</p>
+    <h1>🔥 승리를 향해! 붉은 악마 스코어 예측 🔥</h1>
+    <p class="lead text-white font-weight-bold mt-2">⚽ 제1경기: 대한민국 🇰🇷 vs 체코 🇨🇿</p>
   </div>
 
   <div class="container mt-4">
+    <div class="alert deadline-banner d-flex justify-content-between align-middle p-3 mb-4" id="deadlineAlert">
+      <span>⏰ 베팅 및 예측 수정 마감: 2026년 6월 12일 (금) 오전 10:00 (경기 1시간 전)</span>
+      <span id="timeLeft" class="badge bg-danger">계산 중...</span>
+    </div>
+
     <ul class="nav nav-tabs mb-4" id="predictTab" role="tablist">
       <li class="nav-item"><button class="nav-link active" id="bet-tab" data-bs-toggle="tab" data-bs-target="#bet">🎯 베팅하기</button></li>
       <li class="nav-item"><button class="nav-link" id="board-tab" data-bs-toggle="tab" data-bs-target="#board" onclick="loadData()">📊 결과 보기</button></li>
@@ -38,94 +48,115 @@
     </ul>
 
     <div class="tab-content" id="predictTabContent">
-      <!-- 1. 베팅하기 탭 -->
       <div class="tab-pane fade show active" id="bet">
         <div class="card p-4">
           <div class="mb-3">
             <label class="form-label fw-bold">1. 본인의 이름을 입력해주세요</label>
-            <input type="text" id="userName" class="form-control" placeholder="홍길동">
+            <input type="text" id="userName" class="form-control form-control-lg" placeholder="홍길동">
           </div>
           <div class="mb-3">
             <label class="form-label fw-bold">2. 예상 스코어 선택 (한국 득점, 체코 득점 순)</label>
             <div class="row">
               <div class="col">
-                <select id="scoreKor" class="form-select"><option value="">대한민국 득점</option></select>
+                <select id="scoreKor" class="form-select form-select-lg"><option value="">대한민국 득점</option></select>
               </div>
               <div class="col">
-                <select id="scoreCzech" class="form-select"><option value="">체코 득점</option></select>
+                <select id="scoreCzech" class="form-select form-select-lg"><option value="">체코 득점</option></select>
               </div>
             </div>
           </div>
-          <div class="alert alert-dark border-warning text-light mt-3">
-            💰 <b>참가 안내:</b> 1베팅당 참가비는 <b>10,000원</b>입니다. (다른 스코어로 다중 베팅 가능)<br>
+          <div class="alert alert-dark border text-dark mt-3 bg-light">
+            💰 <b>참가 안내:</b> 1베팅당 참가비는 <b>10,000원</b>입니다. (다중 스코어 중복 베팅 가능)<br>
             🏦 <b>입금 계좌:</b> 기업은행 010-9023-0129 (예금주: 한재민)
           </div>
-          <button id="submitBtn" class="btn btn-danger w-100 py-2 fw-bold" onclick="submitBetting()">🔥 대한민국 응원하며 베팅 제출</button>
+          <button id="submitBtn" class="btn btn-danger w-100 py-3 fs-5" onclick="submitBetting()">🔥 대박을 기원하며 베팅 제출</button>
         </div>
       </div>
 
-      <!-- 2. 결과 보기 및 예상 배당금 탭 -->
       <div class="tab-pane fade" id="board">
-        <h3 class="mb-3">💰 실시간 배당 현황</h3>
-        <div class="alert alert-info" id="totalPoolBox">데이터를 동기화하는 중...</div>
+        <div class="alert alert-danger text-center bg-danger text-white p-3 mb-4" id="totalPoolBox">데이터를 동기화하는 중...</div>
         <div class="row">
           <div class="col-md-4">
-            <h4 class="text-danger border-bottom pb-2">🇰🇷 대한민국 승리 스코어 파트</h4>
-            <div id="korWinList" class="loading-text">불러오는 중...</div>
+            <h4 class="text-danger border-bottom pb-2 mb-3">🇰🇷 대한민국 승리 파트</h4>
+            <div id="korWinList" class="text-muted italic">불러오는 중...</div>
           </div>
           <div class="col-md-4">
-            <h4 class="text-warning border-bottom pb-2">🤝 무승부 스코어 파트</h4>
-            <div id="drawList" class="loading-text">불러오는 중...</div>
+            <h4 class="text-success border-bottom pb-2 mb-3">🤝 무승부 파트</h4>
+            <div id="drawList" class="text-muted italic">불러오는 중...</div>
           </div>
           <div class="col-md-4">
-            <h4 class="text-info border-bottom pb-2">🇨🇿 체코 승리 스코어 파트</h4>
-            <div id="czechWinList" class="loading-text">불러오는 중...</div>
+            <h4 class="text-primary border-bottom pb-2 mb-3">🇨🇿 체코 승리 파트</h4>
+            <div id="czechWinList" class="text-muted italic">불러오는 중...</div>
           </div>
         </div>
       </div>
 
-      <!-- 3. 나의 베팅 현황 탭 -->
       <div class="tab-pane fade" id="my">
-        <h3>🙋 나의 예측 및 예상 배당금 검색</h3>
-        <div class="input-group mb-3">
-          <input type="text" id="searchName" class="form-control" placeholder="이름을 입력하세요">
-          <button class="btn btn-danger" onclick="searchMyBet()">조회하기</button>
+        <h3 class="mb-3">🙋 나의 예측 조회 및 수정</h3>
+        <p class="text-muted fs-6">※ 경기 시작 1시간 전까지만 예측 점수를 언제든지 수정할 수 있습니다.</p>
+        <div class="input-group mb-4 shadow-sm">
+          <input type="text" id="searchName" class="form-control form-control-lg" placeholder="등록한 이름을 입력하세요">
+          <button class="btn btn-danger px-4" onclick="searchMyBet()">조회하기</button>
         </div>
         <div id="myResultList"></div>
       </div>
 
-      <!-- 4. 예선전 일정 탭 -->
       <div class="tab-pane fade" id="schedule">
-        <h3 class="mb-3">📅 대한민국 대표팀 조별 예선 경기 일정</h3>
+        <h3 class="mb-3">📅 대한민국 대표팀 경기 일정</h3>
         <div class="card p-4">
-          <div class="table-responsive">
-            <table class="table table-schedule text-center align-middle">
-              <thead>
-                <tr>
-                  <th>매치</th>
-                  <th>대진 내용</th>
-                  <th>경기 일정 (한국 시간)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="fw-bold text-warning">
-                  <td>제 1경기</td>
-                  <td>대한민국 🇰🇷 vs 체코 🇨🇿</td>
-                  <td>2026년 6월 12일 (금) 오전 11:00</td>
-                </tr>
-                <tr>
-                  <td>제 2경기</td>
-                  <td>대한민국 🇰🇷 vs 우루과이 🇺🇾</td>
-                  <td>2026년 6월 16일 (화) 오전 09:30</td>
-                </tr>
-                <tr>
-                  <td>제 3경기</td>
-                  <td>대한민국 🇰🇷 vs 카메룬 🇨🇲</td>
-                  <td>2026년 6월 21일 (일) 오전 11:00</td>
-                </tr>
-              </tbody>
-            </table>
+          <table class="table table-schedule text-center align-middle table-bordered">
+            <thead>
+              <tr>
+                <th>매치</th>
+                <th>대진 내용</th>
+                <th>경기 일정 (한국 시간)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="table-warning fw-bold">
+                <td>제 1경기</td>
+                <td>대한민국 🇰🇷 vs 체코 🇨🇿</td>
+                <td>2026년 6월 12일 (금) 오전 11:00</td>
+              </tr>
+              <tr>
+                <td>제 2경기</td>
+                <td>대한민국 🇰🇷 vs 우루과이 🇺🇾</td>
+                <td>2026년 6월 16일 (화) 오전 09:30</td>
+              </tr>
+              <tr>
+                <td>제 3경기</td>
+                <td>대한민국 🇰🇷 vs 카메룬 🇨🇲</td>
+                <td>2026년 6월 21일 (일) 오전 11:00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="editModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title fw-bold">🔄 스코어 예측 수정</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-dark">
+          <p><b id="modalUser">홍길동</b>님의 기존 선택: <span class="badge bg-secondary fs-6" id="modalOldScore">0:0</span></p>
+          <label class="form-label fw-bold mt-2 text-danger">변경할 새로운 스코어를 선택하세요</label>
+          <div class="row">
+            <div class="col">
+              <select id="editScoreKor" class="form-select form-select-lg"></select>
+            </div>
+            <div class="col">
+              <select id="editScoreCzech" class="form-select form-select-lg"></select>
+            </div>
           </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+          <button type="button" class="btn btn-danger" id="confirmUpdateBtn" onclick="executeEdit()">수정 완료</button>
         </div>
       </div>
     </div>
@@ -133,23 +164,49 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // 제공해주신 새로운 구글 앱스 스크립트 웹앱 최신 URL 연동 완료
-    const APP_URL = "https://script.google.com/macros/s/AKfycbxsKSyXhq0VPfKkScoIiEwROgI4jP5u82G1Wmn1JERCt-qc0c7z9sy7KaI2J1E6OXmq/exec";
+    // 전송받은 신규 구글 앱스 스크립트 웹앱 주소 세팅 완료
+    const APP_URL = "https://script.google.com/macros/s/AKfycbxfPlybtCK1Qmd-IwOoUaMGvKR_HGaGeWNKnqlSSUzO_ZvJKbwmZXb7oGcqCV5ob_s4/exec";
+    const MATCH_DEADLINE = new Date("2026-06-12T10:00:00+09:00");
 
     const scoreKor = document.getElementById('scoreKor');
     const scoreCzech = document.getElementById('scoreCzech');
+    const editScoreKor = document.getElementById('editScoreKor');
+    const editScoreCzech = document.getElementById('editScoreCzech');
+
     for(let i=0; i<=9; i++) {
       scoreKor.options.add(new Option(i + "점", i));
       scoreCzech.options.add(new Option(i + "점", i));
+      editScoreKor.options.add(new Option(i + "점", i));
+      editScoreCzech.options.add(new Option(i + "점", i));
     }
 
     let globalData = [];
+    let currentEditData = {}; 
+    let isExpired = false;
 
     window.onload = function() {
+      checkDeadline();
       loadData();
+      setInterval(checkDeadline, 1000);
     };
 
-    // 깃허브(외부) 환경에서 안전하게 구글 데이터를 요청하는 fetch 함수
+    function checkDeadline() {
+      const now = new Date();
+      const diff = MATCH_DEADLINE - now;
+      if (diff <= 0) {
+        isExpired = true;
+        document.getElementById('timeLeft').innerText = "🔒 베팅 및 수정 마감됨";
+        document.getElementById('submitBtn').disabled = true;
+        document.getElementById('submitBtn').innerText = "🔒 경기 1시간 전으로 베팅이 마감되었습니다.";
+        document.getElementById('submitBtn').classList.replace('btn-danger', 'btn-secondary');
+      } else {
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        document.getElementById('timeLeft').innerText = `⏳ 마감까지: ${hours}시간 ${minutes}분 ${seconds}초 남음`;
+      }
+    }
+
     function loadData() {
       fetch(APP_URL, {
         method: "POST",
@@ -161,11 +218,11 @@
         globalData = data;
         renderBoard();
       })
-      .catch(err => console.error("데이터 로드 실패:", err));
+      .catch(err => console.error("데이터 동기화 실패:", err));
     }
 
-    // 깃허브에서 구글 시트로 사용자 베팅 내역을 전송하는 fetch 함수
     function submitBetting() {
+      if(isExpired) { alert("마감 시간이 지나 신청이 불가능합니다."); return; }
       const name = document.getElementById('userName').value.trim();
       const sk = scoreKor.value;
       const sc = scoreCzech.value;
@@ -182,18 +239,13 @@
       fetch(APP_URL, {
         method: "POST",
         headers: { "Content-Type": "text/plain" },
-        body: JSON.stringify({
-          action: "submit",
-          userName: name,
-          scoreKor: sk,
-          scoreCzech: sc
-        })
+        body: JSON.stringify({ action: "submit", userName: name, scoreKor: sk, scoreCzech: sc })
       })
       .then(res => res.json())
       .then(res => {
         alert(res.message);
         btn.disabled = false;
-        btn.innerText = "🔥 대한민국 응원하며 베팅 제출";
+        btn.innerText = "🔥 대박을 기원하며 베팅 제출";
         if(res.success) {
           document.getElementById('userName').value = '';
           scoreKor.value = "";
@@ -202,15 +254,15 @@
         }
       })
       .catch(err => {
-        alert("구글 서버와의 통신 에러가 발생했습니다.");
+        alert("통신 에러가 발생했습니다.");
         btn.disabled = false;
-        btn.innerText = "🔥 대한민국 응원하며 베팅 제출";
+        btn.innerText = "🔥 대박을 기원하며 베팅 제출";
       });
     }
 
     function renderBoard() {
       let totalPool = globalData.reduce((acc, row) => acc + (Number(row['입금확인']) === 10000 ? 10000 : 0), 0);
-      document.getElementById('totalPoolBox').innerHTML = `<h3>🔥 현재 입금확정 총 판돈: ${totalPool.toLocaleString()}원</h3>`;
+      document.getElementById('totalPoolBox').innerHTML = `<h3 class='mb-0'>🔥 현재 입금확정 총 판돈: ${totalPool.toLocaleString()}원</h3>`;
 
       let scoreCounts = {};
       globalData.forEach(row => {
@@ -239,10 +291,10 @@
         for(let score in partGroup) {
           let confirmedCount = scoreCounts[score] || 0;
           let dividend = confirmedCount > 0 ? Math.floor(totalPool / confirmedCount) : 0;
-          html += `<div class='card p-3 mb-2'>
-            <div class='mb-1'>⚽ <b>[${score}] 스코어</b></div>
-            <div class='text-light mb-2' style='font-size:0.9rem;'>배팅: ${partGroup[score].join(', ')}</div>
-            <div class='text-warning fw-bold' style='font-size:0.85rem;'>🎯 적중 시 예상 배당금: ${dividend.toLocaleString()}원</div>
+          html += `<div class='card card-score-box p-3 mb-2'>
+            <div class='mb-1 fs-5 text-dark'>⚽ <b>[${score}] 스코어</b></div>
+            <div class='text-secondary mb-2' style='font-size:0.95rem;'>배팅: ${partGroup[score].join(', ')}</div>
+            <div class='text-danger fw-bold' style='font-size:0.95rem;'>🎯 적중 시 예상 배당금: ${dividend.toLocaleString()}원</div>
           </div>`;
         }
         return html;
@@ -255,10 +307,7 @@
 
     function searchMyBet() {
       const sName = document.getElementById('searchName').value.trim();
-      if(!sName) {
-        alert("이름을 입력해주세요!");
-        return;
-      }
+      if(!sName) { alert("이름을 입력해주세요!"); return; }
       
       let totalPool = globalData.reduce((acc, row) => acc + (Number(row['입금확인']) === 10000 ? 10000 : 0), 0);
       let scoreCounts = {};
@@ -275,21 +324,78 @@
       if(myRows.length === 0) {
         html = '<p class="text-danger mt-2">입력하신 이름으로 참여한 내역이 없습니다.</p>';
       } else {
-        myRows.forEach(row => {
+        myRows.forEach((row, idx) => {
           let isPaid = Number(row['입금확인']) === 10000;
-          let status = isPaid ? "<span class='text-success fw-bold'>✅ 입금 확인 완료</span>" : "<span class='text-warning fw-bold'>⏳ 입금 확인 대기 중 (미반영)</span>";
+          let status = isPaid ? "<span class='text-success fw-bold'>✅ 입금 확인 완료</span>" : "<span class='text-warning fw-bold'>⏳ 입금 확인 대기 중</span>";
           let scoreKey = row['한국점수'] + ":" + row['체코점수'];
           let count = scoreCounts[scoreKey] || 0;
           let dividend = (isPaid && count > 0) ? Math.floor(totalPool / count) : 0;
           
-          html += `<div class='card p-3 mb-2'>
-            <h5>예측 스코어: <span class='badge badge-score'>${scoreKey}</span></h5>
-            <p class='mb-1'>결제 상태: ${status}</p>
-            <p class='mb-0 text-warning'><b>적중 시 예상 수령액: ${dividend.toLocaleString()}원</b> <br><span class='text-muted' style='font-size:0.8rem;'>(현재 이 스코어에 베팅하고 입금이 완료된 인원: ${count}명)</span></p>
+          let editBtnHtml = isExpired 
+            ? `<button class='btn btn-sm btn-secondary mt-2 w-100' disabled>🔒 수정 기한 만료</button>`
+            : `<button class='btn btn-sm btn-outline-danger mt-2 w-100' onclick='openEditModal("${row['성명']}", ${row['한국점수']}, ${row['체코점수']})'>🔄 예측 스코어 수정하기</button>`;
+
+          html += `<div class='card p-3 mb-2 text-dark card-score-box'>
+            <div class='d-flex justify-content-between align-items-center'>
+              <h5>예측 스코어: <span class='badge badge-score'>${scoreKey}</span></h5>
+              <div>${status}</div>
+            </div>
+            <p class='mb-0 text-secondary' style='font-size:0.9rem;'>적중 시 예상 수령액: <b class='text-danger'>${dividend.toLocaleString()}원</b> (확정 인원: ${count}명)</p>
+            ${editBtnHtml}
           </div>`;
         });
       }
       document.getElementById('myResultList').innerHTML = html;
+    }
+
+    function openEditModal(name, kor, czech) {
+      if(isExpired) { alert("수정 가능 시간이 지났습니다."); return; }
+      currentEditData = { userName: name, oldKor: kor, oldCzech: czech };
+      document.getElementById('modalUser').innerText = name;
+      document.getElementById('modalOldScore').innerText = `${kor} : ${czech}`;
+      editScoreKor.value = kor;
+      editScoreCzech.value = czech;
+      
+      const myModal = new bootstrap.Modal(document.getElementById('editModal'));
+      myModal.show();
+    }
+
+    function executeEdit() {
+      if(isExpired) { alert("수정 가능 시간이 지났습니다."); return; }
+      const nk = editScoreKor.value;
+      const nc = editScoreCzech.value;
+      
+      const confirmBtn = document.getElementById('confirmUpdateBtn');
+      confirmBtn.disabled = true;
+      confirmBtn.innerText = "수정 중...";
+
+      fetch(APP_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({
+          action: "update",
+          userName: currentEditData.userName,
+          oldKor: currentEditData.oldKor,
+          oldCzech: currentEditData.oldCzech,
+          newKor: nk,
+          newCzech: nc
+        })
+      })
+      .then(res => res.json())
+      .then(res => {
+        alert(res.message);
+        confirmBtn.disabled = false;
+        confirmBtn.innerText = "수정 완료";
+        bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+        loadData();
+        document.getElementById('searchName').value = currentEditData.userName;
+        searchMyBet();
+      })
+      .catch(err => {
+        alert("수정 중 오류가 발생했습니다.");
+        confirmBtn.disabled = false;
+        confirmBtn.innerText = "수정 완료";
+      });
     }
   </script>
 </body>
