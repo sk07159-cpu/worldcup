@@ -38,6 +38,7 @@
     </ul>
 
     <div class="tab-content" id="predictTabContent">
+      <!-- 1. 베팅하기 탭 -->
       <div class="tab-pane fade show active" id="bet">
         <div class="card p-4">
           <div class="mb-3">
@@ -63,6 +64,7 @@
         </div>
       </div>
 
+      <!-- 2. 결과 보기 및 예상 배당금 탭 -->
       <div class="tab-pane fade" id="board">
         <h3 class="mb-3">💰 실시간 배당 현황</h3>
         <div class="alert alert-info" id="totalPoolBox">데이터를 동기화하는 중...</div>
@@ -82,6 +84,7 @@
         </div>
       </div>
 
+      <!-- 3. 나의 베팅 현황 탭 -->
       <div class="tab-pane fade" id="my">
         <h3>🙋 나의 예측 및 예상 배당금 검색</h3>
         <div class="input-group mb-3">
@@ -91,6 +94,7 @@
         <div id="myResultList"></div>
       </div>
 
+      <!-- 4. 예선전 일정 탭 -->
       <div class="tab-pane fade" id="schedule">
         <h3 class="mb-3">📅 대한민국 대표팀 조별 예선 경기 일정</h3>
         <div class="card p-4">
@@ -101,7 +105,6 @@
                   <th>매치</th>
                   <th>대진 내용</th>
                   <th>경기 일정 (한국 시간)</th>
-                  <th>비고</th>
                 </tr>
               </thead>
               <tbody>
@@ -109,25 +112,19 @@
                   <td>제 1경기</td>
                   <td>대한민국 🇰🇷 vs 체코 🇨🇿</td>
                   <td>2026년 6월 12일 (금) 오전 11:00</td>
-                  <td>현재 예측 진행 중!</td>
                 </tr>
                 <tr>
                   <td>제 2경기</td>
                   <td>대한민국 🇰🇷 vs 우루과이 🇺🇾</td>
                   <td>2026년 6월 16일 (화) 오전 09:30</td>
-                  <td>-</td>
                 </tr>
                 <tr>
                   <td>제 3경기</td>
                   <td>대한민국 🇰🇷 vs 카메룬 🇨🇲</td>
                   <td>2026년 6월 21일 (일) 오전 11:00</td>
-                  <td>-</td>
                 </tr>
               </tbody>
             </table>
-          </div>
-          <div class="alert alert-dark mt-2 border-danger text-muted" style="font-size: 0.85rem;">
-            ※ 위 일정은 대회 공식 조직위원회 및 중계 사정에 따라 일부 변경될 수 있습니다.
           </div>
         </div>
       </div>
@@ -136,8 +133,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // [업데이트 완료] 새로 제공해주신 최종 URL을 연동했습니다.
-    const APP_URL = "https://script.google.com/macros/s/AKfycbxrU-d4yEDnIusd9R9E4xWA3tmL0TG1vOjI6V68oBjMd33TC1nFlG5ntgh1n2hmWxLA/exec";
+    // 제공해주신 새로운 구글 앱스 스크립트 웹앱 최신 URL 연동 완료
+    const APP_URL = "https://script.google.com/macros/s/AKfycbxsKSyXhq0VPfKkScoIiEwROgI4jP5u82G1Wmn1JERCt-qc0c7z9sy7KaI2J1E6OXmq/exec";
 
     const scoreKor = document.getElementById('scoreKor');
     const scoreCzech = document.getElementById('scoreCzech');
@@ -152,13 +149,22 @@
       loadData();
     };
 
+    // 깃허브(외부) 환경에서 안전하게 구글 데이터를 요청하는 fetch 함수
     function loadData() {
-      google.script.run.withSuccessHandler(function(data) {
+      fetch(APP_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({ action: "getData" })
+      })
+      .then(res => res.json())
+      .then(data => {
         globalData = data;
         renderBoard();
-      }).getDashboardData();
+      })
+      .catch(err => console.error("데이터 로드 실패:", err));
     }
 
+    // 깃허브에서 구글 시트로 사용자 베팅 내역을 전송하는 fetch 함수
     function submitBetting() {
       const name = document.getElementById('userName').value.trim();
       const sk = scoreKor.value;
@@ -173,7 +179,18 @@
       btn.disabled = true;
       btn.innerText = "⏳ 베팅 등록 중...";
 
-      google.script.run.withSuccessHandler(function(res) {
+      fetch(APP_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({
+          action: "submit",
+          userName: name,
+          scoreKor: sk,
+          scoreCzech: sc
+        })
+      })
+      .then(res => res.json())
+      .then(res => {
         alert(res.message);
         btn.disabled = false;
         btn.innerText = "🔥 대한민국 응원하며 베팅 제출";
@@ -183,7 +200,12 @@
           scoreCzech.value = "";
           loadData();
         }
-      }).submitBet(name, sk, sc);
+      })
+      .catch(err => {
+        alert("구글 서버와의 통신 에러가 발생했습니다.");
+        btn.disabled = false;
+        btn.innerText = "🔥 대한민국 응원하며 베팅 제출";
+      });
     }
 
     function renderBoard() {
