@@ -35,6 +35,7 @@
   </div>
 
   <div class="container mt-4">
+    <!-- 마감 시간 실시간 알림판 -->
     <div class="alert deadline-banner d-flex justify-content-between align-middle p-3 mb-4" id="deadlineAlert">
       <span>⏰ 베팅 및 예측 수정 마감: 2026년 6월 12일 (금) 오전 10:00 (경기 1시간 전)</span>
       <span id="timeLeft" class="badge bg-danger">계산 중...</span>
@@ -48,6 +49,7 @@
     </ul>
 
     <div class="tab-content" id="predictTabContent">
+      <!-- 1. 베팅하기 탭 -->
       <div class="tab-pane fade show active" id="bet">
         <div class="card p-4">
           <div class="mb-3">
@@ -73,6 +75,7 @@
         </div>
       </div>
 
+      <!-- 2. 결과 보기 탭 -->
       <div class="tab-pane fade" id="board">
         <div class="alert alert-danger text-center bg-danger text-white p-3 mb-4" id="totalPoolBox">데이터를 동기화하는 중...</div>
         <div class="row">
@@ -91,6 +94,7 @@
         </div>
       </div>
 
+      <!-- 3. 나의 베팅 현황 탭 -->
       <div class="tab-pane fade" id="my">
         <h3 class="mb-3">🙋 나의 예측 조회 및 수정</h3>
         <p class="text-muted fs-6">※ 경기 시작 1시간 전까지만 예측 점수를 언제든지 수정할 수 있습니다.</p>
@@ -101,6 +105,7 @@
         <div id="myResultList"></div>
       </div>
 
+      <!-- 4. 예선전 일정 탭 -->
       <div class="tab-pane fade" id="schedule">
         <h3 class="mb-3">📅 대한민국 대표팀 경기 일정</h3>
         <div class="card p-4">
@@ -135,6 +140,7 @@
     </div>
   </div>
 
+  <!-- 점수 수정 팝업 모달 -->
   <div class="modal fade" id="editModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -164,8 +170,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // 전송받은 신규 구글 앱스 스크립트 웹앱 주소 세팅 완료
-    const APP_URL = "https://script.google.com/macros/s/AKfycbxfPlybtCK1Qmd-IwOoUaMGvKR_HGaGeWNKnqlSSUzO_ZvJKbwmZXb7oGcqCV5ob_s4/exec";
+    // 새로 제공해주신 전용 구글 앱스 스크립트 웹앱 주소 세팅 완료
+    const APP_URL = "https://script.google.com/macros/s/AKfycbyD4Xwd9tivnqUEfcqeSPw2u8txcpaUH1pN7wPA6qmm9MvFPP98XwRjKf-g867l_vxK/exec";
     const MATCH_DEADLINE = new Date("2026-06-12T10:00:00+09:00");
 
     const scoreKor = document.getElementById('scoreKor');
@@ -173,6 +179,7 @@
     const editScoreKor = document.getElementById('editScoreKor');
     const editScoreCzech = document.getElementById('editScoreCzech');
 
+    // 스코어 선택 드롭다운 초기화 (0점 ~ 9점)
     for(let i=0; i<=9; i++) {
       scoreKor.options.add(new Option(i + "점", i));
       scoreCzech.options.add(new Option(i + "점", i));
@@ -261,15 +268,15 @@
     }
 
     function renderBoard() {
-      let totalPool = globalData.reduce((acc, row) => acc + (Number(row['입금확인']) === 10000 ? 10000 : 0), 0);
-      document.getElementById('totalPoolBox').innerHTML = `<h3 class='mb-0'>🔥 현재 입금확정 총 판돈: ${totalPool.toLocaleString()}원</h3>`;
+      // 신청된 모든 인원(입금 확인 여부 무관)을 기반으로 총 판돈 계산
+      let totalPool = globalData.length * 10000;
+      document.getElementById('totalPoolBox').innerHTML = `<h3 class='mb-0'>🔥 현재 실시간 총 예상 판돈: ${totalPool.toLocaleString()}원</h3>`;
 
+      // 전체 데이터를 기준으로 스코어별 인원수 카운트
       let scoreCounts = {};
       globalData.forEach(row => {
-        if(Number(row['입금확인']) === 10000) {
-          let scoreKey = row['한국점수'] + ":" + row['체코점수'];
-          scoreCounts[scoreKey] = (scoreCounts[scoreKey] || 0) + 1;
-        }
+        let scoreKey = row['한국점수'] + ":" + row['체코점수'];
+        scoreCounts[scoreKey] = (scoreCounts[scoreKey] || 0) + 1;
       });
 
       let groups = { korWin: {}, draw: {}, czechWin: {} };
@@ -282,7 +289,7 @@
         let part = (k > c) ? 'korWin' : ((k === c) ? 'draw' : 'czechWin');
         if(!groups[part][scoreKey]) groups[part][scoreKey] = [];
         
-        let statusText = Number(row['입금확인']) === 10000 ? `<span class='text-success fw-bold'>(확정)</span>` : `<span class='text-muted'>(대기)</span>`;
+        let statusText = Number(row['입금확인']) === 10000 ? `<span class='text-success fw-bold'>(확정)</span>` : `<span class='text-muted'>(신청)</span>`;
         groups[part][scoreKey].push(row['성명'] + statusText);
       });
 
@@ -309,13 +316,11 @@
       const sName = document.getElementById('searchName').value.trim();
       if(!sName) { alert("이름을 입력해주세요!"); return; }
       
-      let totalPool = globalData.reduce((acc, row) => acc + (Number(row['입금확인']) === 10000 ? 10000 : 0), 0);
+      let totalPool = globalData.length * 10000;
       let scoreCounts = {};
       globalData.forEach(row => {
-        if(Number(row['입금확인']) === 10000) {
-          let scoreKey = row['한국점수'] + ":" + row['체코점수'];
-          scoreCounts[scoreKey] = (scoreCounts[scoreKey] || 0) + 1;
-        }
+        let scoreKey = row['한국점수'] + ":" + row['체코점수'];
+        scoreCounts[scoreKey] = (scoreCounts[scoreKey] || 0) + 1;
       });
 
       let myRows = globalData.filter(row => row['성명'] === sName);
@@ -329,7 +334,7 @@
           let status = isPaid ? "<span class='text-success fw-bold'>✅ 입금 확인 완료</span>" : "<span class='text-warning fw-bold'>⏳ 입금 확인 대기 중</span>";
           let scoreKey = row['한국점수'] + ":" + row['체코점수'];
           let count = scoreCounts[scoreKey] || 0;
-          let dividend = (isPaid && count > 0) ? Math.floor(totalPool / count) : 0;
+          let dividend = count > 0 ? Math.floor(totalPool / count) : 0;
           
           let editBtnHtml = isExpired 
             ? `<button class='btn btn-sm btn-secondary mt-2 w-100' disabled>🔒 수정 기한 만료</button>`
@@ -340,7 +345,7 @@
               <h5>예측 스코어: <span class='badge badge-score'>${scoreKey}</span></h5>
               <div>${status}</div>
             </div>
-            <p class='mb-0 text-secondary' style='font-size:0.9rem;'>적중 시 예상 수령액: <b class='text-danger'>${dividend.toLocaleString()}원</b> (확정 인원: ${count}명)</p>
+            <p class='mb-0 text-secondary' style='font-size:0.9rem;'>적중 시 예상 수령액: <b class='text-danger'>${dividend.toLocaleString()}원</b> (참여 인원: ${count}명)</p>
             ${editBtnHtml}
           </div>`;
         });
