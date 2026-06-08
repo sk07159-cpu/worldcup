@@ -35,7 +35,6 @@
   </div>
 
   <div class="container mt-4">
-    <!-- 마감 시간 실시간 알림판 -->
     <div class="alert deadline-banner d-flex justify-content-between align-middle p-3 mb-4" id="deadlineAlert">
       <span>⏰ 베팅 및 예측 수정 마감: 2026년 6월 12일 (금) 오전 10:00 (경기 1시간 전)</span>
       <span id="timeLeft" class="badge bg-danger">계산 중...</span>
@@ -49,7 +48,6 @@
     </ul>
 
     <div class="tab-content" id="predictTabContent">
-      <!-- 1. 베팅하기 탭 -->
       <div class="tab-pane fade show active" id="bet">
         <div class="card p-4">
           <div class="mb-3">
@@ -75,7 +73,6 @@
         </div>
       </div>
 
-      <!-- 2. 결과 보기 탭 -->
       <div class="tab-pane fade" id="board">
         <div class="alert alert-danger text-center bg-danger text-white p-3 mb-4" id="totalPoolBox">데이터를 동기화하는 중...</div>
         <div class="row">
@@ -94,10 +91,9 @@
         </div>
       </div>
 
-      <!-- 3. 나의 베팅 현황 탭 -->
       <div class="tab-pane fade" id="my">
-        <h3 class="mb-3">🙋 나의 예측 조회 및 수정</h3>
-        <p class="text-muted fs-6">※ 경기 시작 1시간 전까지만 예측 점수를 언제든지 수정할 수 있습니다.</p>
+        <h3 class="mb-3">🙋 나의 예측 조회 및 수정 / 취소</h3>
+        <p class="text-muted fs-6">※ 경기 시작 1시간 전까지만 예측 스코어 수정 및 베팅 취소가 가능합니다.</p>
         <div class="input-group mb-4 shadow-sm">
           <input type="text" id="searchName" class="form-control form-control-lg" placeholder="등록한 이름을 입력하세요">
           <button class="btn btn-danger px-4" onclick="searchMyBet()">조회하기</button>
@@ -105,7 +101,6 @@
         <div id="myResultList"></div>
       </div>
 
-      <!-- 4. 예선전 일정 탭 -->
       <div class="tab-pane fade" id="schedule">
         <h3 class="mb-3">📅 대한민국 대표팀 경기 일정</h3>
         <div class="card p-4">
@@ -140,7 +135,6 @@
     </div>
   </div>
 
-  <!-- 점수 수정 팝업 모달 -->
   <div class="modal fade" id="editModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -170,8 +164,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // 새로 제공해주신 전용 구글 앱스 스크립트 웹앱 주소 세팅 완료
-    const APP_URL = "https://script.google.com/macros/s/AKfycbyD4Xwd9tivnqUEfcqeSPw2u8txcpaUH1pN7wPA6qmm9MvFPP98XwRjKf-g867l_vxK/exec";
+    // [업데이트] 새로 제공해주신 전용 구글 앱스 스크립트 웹앱 주소 반영 완료
+    const APP_URL = "https://script.google.com/macros/s/AKfycbywDtrzjgGalW9-At6DP_cmKnpZsYU_sfpFrKeA3uC6h-UC9Qa4wWHq7DcSFvnYY4GL/exec";
     const MATCH_DEADLINE = new Date("2026-06-12T10:00:00+09:00");
 
     const scoreKor = document.getElementById('scoreKor');
@@ -268,7 +262,7 @@
     }
 
     function renderBoard() {
-      // 신청된 모든 인원(입금 확인 여부 무관)을 기반으로 총 판돈 계산
+      // 신청된 모든 인원(입금 여부 무관)을 기반으로 총 판돈 계산
       let totalPool = globalData.length * 10000;
       document.getElementById('totalPoolBox').innerHTML = `<h3 class='mb-0'>🔥 현재 실시간 총 예상 판돈: ${totalPool.toLocaleString()}원</h3>`;
 
@@ -336,9 +330,16 @@
           let count = scoreCounts[scoreKey] || 0;
           let dividend = count > 0 ? Math.floor(totalPool / count) : 0;
           
-          let editBtnHtml = isExpired 
-            ? `<button class='btn btn-sm btn-secondary mt-2 w-100' disabled>🔒 수정 기한 만료</button>`
-            : `<button class='btn btn-sm btn-outline-danger mt-2 w-100' onclick='openEditModal("${row['성명']}", ${row['한국점수']}, ${row['체코점수']})'>🔄 예측 스코어 수정하기</button>`;
+          let actionBtnsHtml = isExpired 
+            ? `<button class='btn btn-sm btn-secondary mt-2 w-100' disabled>🔒 수정 및 취소 기한 만료</button>`
+            : `<div class='row g-2 mt-2'>
+                <div class='col-6'>
+                  <button class='btn btn-sm btn-outline-danger w-100' onclick='openEditModal("${row['성명']}", ${row['한국점수']}, ${row['체코점수']})'>🔄 스코어 수정</button>
+                </div>
+                <div class='col-6'>
+                  <button class='btn btn-sm btn-dark w-100' onclick='deleteBetting("${row['성명']}", ${row['한국점수']}, ${row['체코점수']})'>🗑️ 베팅 취소</button>
+                </div>
+               </div>`;
 
           html += `<div class='card p-3 mb-2 text-dark card-score-box'>
             <div class='d-flex justify-content-between align-items-center'>
@@ -346,7 +347,7 @@
               <div>${status}</div>
             </div>
             <p class='mb-0 text-secondary' style='font-size:0.9rem;'>적중 시 예상 수령액: <b class='text-danger'>${dividend.toLocaleString()}원</b> (참여 인원: ${count}명)</p>
-            ${editBtnHtml}
+            ${actionBtnsHtml}
           </div>`;
         });
       }
@@ -400,6 +401,35 @@
         alert("수정 중 오류가 발생했습니다.");
         confirmBtn.disabled = false;
         confirmBtn.innerText = "수정 완료";
+      });
+    }
+
+    // 베팅 취소 처리 전송 함수
+    function deleteBetting(name, kor, czech) {
+      if(isExpired) { alert("취소 가능 시간이 지났습니다."); return; }
+      if(!confirm(`⚠️ [${name}]님의 [${kor}:${czech}] 베팅을 정말 취소하시겠습니까?\n취소 시 시트에서 해당 내역이 즉시 삭제됩니다.`)) {
+        return;
+      }
+
+      fetch(APP_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({
+          action: "delete",
+          userName: name,
+          scoreKor: kor,
+          scoreCzech: czech
+        })
+      })
+      .then(res => res.json())
+      .then(res => {
+        alert(res.message);
+        loadData();
+        document.getElementById('searchName').value = name;
+        searchMyBet(); 
+      })
+      .catch(err => {
+        alert("베팅 취소 중 통신 오류가 발생했습니다.");
       });
     }
   </script>
