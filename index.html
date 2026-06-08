@@ -2,6 +2,16 @@
 <html>
 <head>
   <base target="_top">
+  <meta charset="UTF-8">
+  
+  <!-- 🔥 카카오톡 / SNS 공유용 미리보기(Open Graph) 설정 추가 -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="⚽ 혁산회, 월드컵 예선 스코어 예측! ⚽">
+  <meta property="og:description" content="🔥 혁산회, 월드컵 4강 함께 가요! 지금 스코어를 예측하고 배당금을 획득하세요!">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1200">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
@@ -48,6 +58,7 @@
     </ul>
 
     <div class="tab-content" id="predictTabContent">
+      <!-- 1. 베팅하기 탭 -->
       <div class="tab-pane fade show active" id="bet">
         <div class="card p-4">
           <div class="mb-3">
@@ -73,6 +84,7 @@
         </div>
       </div>
 
+      <!-- 2. 결과 보기 탭 -->
       <div class="tab-pane fade" id="board">
         <div class="alert alert-danger text-center bg-danger text-white p-3 mb-4" id="totalPoolBox">데이터를 동기화하는 중...</div>
         <div class="row">
@@ -91,6 +103,7 @@
         </div>
       </div>
 
+      <!-- 3. 나의 베팅 현황 탭 -->
       <div class="tab-pane fade" id="my">
         <h3 class="mb-3">🙋 나의 예측 조회 및 수정 / 취소</h3>
         <p class="text-muted fs-6">※ 경기 시작 1시간 전까지만 예측 스코어 수정 및 베팅 취소가 가능합니다.</p>
@@ -101,6 +114,7 @@
         <div id="myResultList"></div>
       </div>
 
+      <!-- 4. 예선전 일정 탭 -->
       <div class="tab-pane fade" id="schedule">
         <h3 class="mb-3">📅 대한민국 대표팀 경기 일정</h3>
         <div class="card p-4">
@@ -135,6 +149,7 @@
     </div>
   </div>
 
+  <!-- 점수 수정 팝업 모달 -->
   <div class="modal fade" id="editModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -164,7 +179,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // [업데이트] 새로 제공해주신 전용 구글 앱스 스크립트 웹앱 주소 반영 완료
     const APP_URL = "https://script.google.com/macros/s/AKfycbywDtrzjgGalW9-At6DP_cmKnpZsYU_sfpFrKeA3uC6h-UC9Qa4wWHq7DcSFvnYY4GL/exec";
     const MATCH_DEADLINE = new Date("2026-06-12T10:00:00+09:00");
 
@@ -173,7 +187,6 @@
     const editScoreKor = document.getElementById('editScoreKor');
     const editScoreCzech = document.getElementById('editScoreCzech');
 
-    // 스코어 선택 드롭다운 초기화 (0점 ~ 9점)
     for(let i=0; i<=9; i++) {
       scoreKor.options.add(new Option(i + "점", i));
       scoreCzech.options.add(new Option(i + "점", i));
@@ -262,11 +275,9 @@
     }
 
     function renderBoard() {
-      // 신청된 모든 인원(입금 여부 무관)을 기반으로 총 판돈 계산
       let totalPool = globalData.length * 10000;
       document.getElementById('totalPoolBox').innerHTML = `<h3 class='mb-0'>🔥 현재 실시간 총 예상 판돈: ${totalPool.toLocaleString()}원</h3>`;
 
-      // 전체 데이터를 기준으로 스코어별 인원수 카운트
       let scoreCounts = {};
       globalData.forEach(row => {
         let scoreKey = row['한국점수'] + ":" + row['체코점수'];
@@ -404,7 +415,6 @@
       });
     }
 
-    // 베팅 취소 처리 전송 함수
     function deleteBetting(name, kor, czech) {
       if(isExpired) { alert("취소 가능 시간이 지났습니다."); return; }
       if(!confirm(`⚠️ [${name}]님의 [${kor}:${czech}] 베팅을 정말 취소하시겠습니까?\n취소 시 시트에서 해당 내역이 즉시 삭제됩니다.`)) {
