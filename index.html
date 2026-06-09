@@ -4,7 +4,6 @@
   <base target="_top">
   <meta charset="UTF-8">
   
-  <!-- 🔥 카카오톡 / SNS 공유용 미리보기(Open Graph) 설정 추가 -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="⚽ 혁산회, 월드컵 예선 스코어 예측! ⚽">
   <meta property="og:description" content="🔥 혁산회, 월드컵 4강 함께 가요! 지금 스코어를 예측하고 배당금을 획득하세요!">
@@ -58,7 +57,6 @@
     </ul>
 
     <div class="tab-content" id="predictTabContent">
-      <!-- 1. 베팅하기 탭 -->
       <div class="tab-pane fade show active" id="bet">
         <div class="card p-4">
           <div class="mb-3">
@@ -78,13 +76,13 @@
           </div>
           <div class="alert alert-dark border text-dark mt-3 bg-light">
             💰 <b>참가 안내:</b> 1베팅당 참가비는 <b>10,000원</b>입니다. (다중 스코어 중복 베팅 가능)<br>
-            🏦 <b>입금 계좌:</b> 기업은행 010-9023-0129 (예금주: 한재민)
+            🏦 <b>입금 계좌:</b> 기업은행 010-9023-0127 (예금주: 한재민)<br>
+            💛 <b>카카오머니(카카오페이)</b>로 송금해 주셔도 확인 가능합니다!
           </div>
           <button id="submitBtn" class="btn btn-danger w-100 py-3 fs-5" onclick="submitBetting()">🔥 대박을 기원하며 베팅 제출</button>
         </div>
       </div>
 
-      <!-- 2. 결과 보기 탭 -->
       <div class="tab-pane fade" id="board">
         <div class="alert alert-danger text-center bg-danger text-white p-3 mb-4" id="totalPoolBox">데이터를 동기화하는 중...</div>
         <div class="row">
@@ -103,7 +101,6 @@
         </div>
       </div>
 
-      <!-- 3. 나의 베팅 현황 탭 -->
       <div class="tab-pane fade" id="my">
         <h3 class="mb-3">🙋 나의 예측 조회 및 수정 / 취소</h3>
         <p class="text-muted fs-6">※ 경기 시작 1시간 전까지만 예측 스코어 수정 및 베팅 취소가 가능합니다.</p>
@@ -114,7 +111,6 @@
         <div id="myResultList"></div>
       </div>
 
-      <!-- 4. 예선전 일정 탭 -->
       <div class="tab-pane fade" id="schedule">
         <h3 class="mb-3">📅 대한민국 대표팀 경기 일정</h3>
         <div class="card p-4">
@@ -149,7 +145,6 @@
     </div>
   </div>
 
-  <!-- 점수 수정 팝업 모달 -->
   <div class="modal fade" id="editModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
