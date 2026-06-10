@@ -53,6 +53,7 @@
       <li class="nav-item"><button class="nav-link active" id="bet-tab" data-bs-toggle="tab" data-bs-target="#bet">🎯 베팅하기</button></li>
       <li class="nav-item"><button class="nav-link" id="board-tab" data-bs-toggle="tab" data-bs-target="#board" onclick="loadData()">📊 결과 보기</button></li>
       <li class="nav-item"><button class="nav-link" id="my-tab" data-bs-toggle="tab" data-bs-target="#my" onclick="loadData()">🙋 나의 베팅 현황</button></li>
+      <li class="nav-item"><button class="nav-link" id="account-tab" data-bs-toggle="tab" data-bs-target="#account">🏦 입금계좌 안내</button></li>
       <li class="nav-item"><button class="nav-link" id="schedule-tab" data-bs-toggle="tab" data-bs-target="#schedule">📅 예선전 일정</button></li>
     </ul>
 
@@ -111,6 +112,20 @@
         <div id="myResultList"></div>
       </div>
 
+      <div class="tab-pane fade" id="account">
+        <h3 class="mb-3">🏦 참가비 입금 및 송금 계좌 안내</h3>
+        <div class="card p-4">
+          <div class="p-3 bg-light rounded border text-dark fs-5">
+            <p class="mb-3">💰 <b>참가 비용:</b> 1베팅당 참가비 <b>10,000원</b> (여러 스코어 중복 신청 가능)</p>
+            <hr>
+            <p class="mb-2">🏦 <b>은행 입금:</b> <span class="badge bg-danger fs-6">기업은행</span> <b>010-9023-0127</b></p>
+            <p class="mb-3">👤 <b>예금주명:</b> <b>한재민</b></p>
+            <hr>
+            <p class="mb-0 text-secondary" style="font-size: 1.1rem;">💛 <b>카카오머니 (카카오페이)</b> 송금 지원방식으로 편리하게 보내셔도 확인 완료 처리됩니다.</p>
+          </div>
+        </div>
+      </div>
+
       <div class="tab-pane fade" id="schedule">
         <h3 class="mb-3">📅 대한민국 대표팀 경기 일정</h3>
         <div class="card p-4">
@@ -131,12 +146,12 @@
               <tr>
                 <td>제 2경기</td>
                 <td>대한민국 🇰🇷 vs 우루과이 🇺🇾</td>
-                <td>2026년 6월 16일 (화) 오전 09:30</td>
+                <td>2026년 6월 19일 (금) 오전 10:00</td>
               </tr>
               <tr>
                 <td>제 3경기</td>
                 <td>대한민국 🇰🇷 vs 카메룬 🇨🇲</td>
-                <td>2026년 6월 21일 (일) 오전 11:00</td>
+                <td>2026년 6월 25일 (목) 오전 10:00</td>
               </tr>
             </tbody>
           </table>
@@ -289,7 +304,8 @@
         let part = (k > c) ? 'korWin' : ((k === c) ? 'draw' : 'czechWin');
         if(!groups[part][scoreKey]) groups[part][scoreKey] = [];
         
-        let statusText = Number(row['입금확인']) === 10000 ? `<span class='text-success fw-bold'>(확정)</span>` : `<span class='text-muted'>(신청)</span>`;
+        // [수정] (확정) 표기를 기획하신대로 (입금)으로 교체
+        let statusText = Number(row['입금확인']) === 10000 ? `<span class='text-success fw-bold'>(입금)</span>` : `<span class='text-muted'>(신청)</span>`;
         groups[part][scoreKey].push(row['성명'] + statusText);
       });
 
@@ -331,7 +347,8 @@
       } else {
         myRows.forEach((row, idx) => {
           let isPaid = Number(row['입금확인']) === 10000;
-          let status = isPaid ? "<span class='text-success fw-bold'>✅ 입금 확인 완료</span>" : "<span class='text-warning fw-bold'>⏳ 입금 확인 대기 중</span>";
+          // [수정] 개인 확인 란에서도 (입금) 형태로 직관성 통일 변경
+          let status = isPaid ? "<span class='text-success fw-bold'>✅ 입금 완료</span>" : "<span class='text-warning fw-bold'>⏳ 입금 확인 대기 중</span>";
           let scoreKey = row['한국점수'] + ":" + row['체코점수'];
           let count = scoreCounts[scoreKey] || 0;
           let dividend = count > 0 ? Math.floor(totalPool / count) : 0;
