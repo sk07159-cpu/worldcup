@@ -143,14 +143,14 @@
                 <td>대한민국 🇰🇷 vs 체코 🇨🇿</td>
                 <td>2026년 6월 12일 (금) 오전 11:00</td>
               </tr>
-              <tr>
+              <tr class="fw-bold">
                 <td>제 2경기</td>
-                <td>대한민국 🇰🇷 vs 우루과이 🇺🇾</td>
+                <td>대한민국 🇰🇷 vs 멕시코 🇲🇽</td>
                 <td>2026년 6월 19일 (금) 오전 10:00</td>
               </tr>
-              <tr>
+              <tr class="fw-bold">
                 <td>제 3경기</td>
-                <td>대한민국 🇰🇷 vs 카메룬 🇨🇲</td>
+                <td>대한민국 🇰🇷 vs 남아공 🇿🇦</td>
                 <td>2026년 6월 25일 (목) 오전 10:00</td>
               </tr>
             </tbody>
@@ -304,7 +304,6 @@
         let part = (k > c) ? 'korWin' : ((k === c) ? 'draw' : 'czechWin');
         if(!groups[part][scoreKey]) groups[part][scoreKey] = [];
         
-        // [수정] (확정) 표기를 기획하신대로 (입금)으로 교체
         let statusText = Number(row['입금확인']) === 10000 ? `<span class='text-success fw-bold'>(입금)</span>` : `<span class='text-muted'>(신청)</span>`;
         groups[part][scoreKey].push(row['성명'] + statusText);
       });
@@ -347,7 +346,6 @@
       } else {
         myRows.forEach((row, idx) => {
           let isPaid = Number(row['입금확인']) === 10000;
-          // [수정] 개인 확인 란에서도 (입금) 형태로 직관성 통일 변경
           let status = isPaid ? "<span class='text-success fw-bold'>✅ 입금 완료</span>" : "<span class='text-warning fw-bold'>⏳ 입금 확인 대기 중</span>";
           let scoreKey = row['한국점수'] + ":" + row['체코점수'];
           let count = scoreCounts[scoreKey] || 0;
